@@ -1,10 +1,14 @@
 
-from file_filtering import find_invalid_files
 from google_api import *
+from arg_parser_builder import build_arg_parser
+import os
 
-MAX_FILE_LIFETIME: int = 30
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("googleapiclient").setLevel(level=logging.ERROR)
+logging.getLogger("oauth2client").setLevel(level=logging.ERROR)
 
-DRIVE_ID = "0ANtwa3WJVNrUUk9PVA"
+
+
 # DRIVE_ID = '1Rq8uetK6bnE6RrzMzf1QRBLUfRVSov8A'
 
 # 
@@ -13,26 +17,10 @@ DRIVE_ID = "0ANtwa3WJVNrUUk9PVA"
 # optional , sa folosesc libraria de logging
 
 def main():
-    try:
-        service = build_service()
-        items = get_drive_files(service, DRIVE_ID)
+   parser = build_arg_parser() 
+   args = parser.parse_args()
 
-        if not items:
-            print("No files found.")
-            return
-
-        invalid_file_list = find_invalid_files(items)
-        for item in invalid_file_list:
-            print(
-                service.files()
-                .delete(fileId=f"{item['id']}", supportsAllDrives=True)
-                .execute()
-            )
-
-    except HttpError as error:
-        # TODO(developer) - Handle errors from drive API.
-        print(f"An error occurred: {error}")
-
+   args.func(args)
 
 if __name__ == "__main__":
     main()

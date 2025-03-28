@@ -1,5 +1,6 @@
 # native libraries
 import sys
+import logging
 # external libraries
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
@@ -11,7 +12,7 @@ REQUESTED_FILE_PARAMS = ["id", "name", "parents", "driveId"]
 
 
 def build_service():
-    return build("drive", "v3", credentials=get_credential("credentials.json"))
+    return build("drive", "v3", credentials=get_credential("res/credentials.json"))
 
 def file_params_string():
     result = ""
@@ -22,12 +23,13 @@ def file_params_string():
     return result
 
 def print_params(item, param_list = REQUESTED_FILE_PARAMS):
-    result: str = ""
+    result: str = "\n"
     for param in param_list:
+        result += param + " : " 
         result += str(item[param])
-        result += " "
+        result += "\n"
 
-    print(result)
+    logging.info(result)
 
 def get_credential(service_account_key_file: str):
     """Creates a Credential object with the correct OAuth2 authorization.
@@ -51,14 +53,20 @@ def get_credential(service_account_key_file: str):
     return credential
 
 
-def get_drive_files(drive_service, drive_id: str):
+def get_drive_files(drive_service, drive_id: str , folder_id : str):
+    query : str = ""
+    if folder_id == "NULL":
+        query = "trashed=false" 
+    else:
+        query= f"trashed=false and '{folder_id}' in parents"
+
     response = (
         drive_service.files()
         .list(
             driveId=drive_id,
             corpora="drive",
             supportsAllDrives=True,
-            q="trashed=false and '17MuX9Rex3J6j0dPr9yWQI_rPyG0CV9A4' in parents",
+            q=query,
             #sa bag flag ul ala ca sa nu returneze foldere
             includeItemsFromAllDrives=True,
             fields=f"files({file_params_string()})",
@@ -70,7 +78,11 @@ def get_drive_files(drive_service, drive_id: str):
 
 
 def print_drive_files(file_list, params = REQUESTED_FILE_PARAMS):
-    print("Files:")
+    if len(file_list) == 0:
+        logging.info("The target destination has no files")
+        return
+    else:
+        logging.info("Files:")
     for item in file_list:
         print_params(item , params)
 

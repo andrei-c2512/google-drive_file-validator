@@ -1,39 +1,47 @@
-
-
+import logging
+# this class manager a .config file. It works in a simple way: since everything is stored in a key value pair(in the file)
+# I do that as well here. If you modify a file variable here , it will modify it in the file
 class ConfigFileManager:
     def __init__(self , path):
-        self.path = path
+        self.path : str = path
+
+        # TO DO: check if the file *actually* exists
+
         self.file_vars : dict[str, str] = {}
         with open(path , 'r') as file:
-            line : str = file.readline()
-        
-            while line:
+            file.seek(0)
+            for line in file: 
                 if line[0] == '#':
-                    continue
-                
+                    continue 
                 parts = line.split(':', 1)
-                line : str = file.readline()
+                if len(parts) != 2:
+                    continue;
+                # we remove the end of line character if it has one , because it is annoying
+                if parts[1][len(parts[1]) -1] == '\n':
+                    parts[1] = parts[1][:-1]
                 self.file_vars.update( { parts[0] : parts[1]})
-            
+                
+        return            
 
-    def set_var(self , name : str , newVal : str) -> None:
-        self.file_vars[name] = newVal
-        with open(self.path , 'w') as file:
-            file_content = file.read(-1)
-            
-            #files in config files are like this : variableName: <value>
-            str_to_find = name + ":"
+    def set_var(self , name : str , new_val : str) -> None:
 
-            variable_value_start = file_content.find() + len(str_to_find)
+        file_data : str = ""
+        with open(self.path , 'r+') as file:
+            for line in file: 
+                if line.find(name) != -1:
+                    line = f"{name}: {new_val}\n"
 
-            print(file_content)
+                file_data += line            
+            #
+        #
 
-        return
-    
+        with open(self.path, 'w') as file:
+            file.write(file_data)
+
     def get_var(self , name : str) -> str:
         return self.file_vars[name]
     
     def print_data(self) -> None:
         for key , value in self.file_vars.items():
-            print(f"{key} : {value}")
+            logging.info(f"{key} : {value}")
         return

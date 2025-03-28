@@ -1,0 +1,6 @@
+# python junk
+*/__pycache__/
+
+# sensitive information
+*credentials.json
+

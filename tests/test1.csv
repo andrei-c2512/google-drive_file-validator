@@ -1,0 +1,15 @@
+input,expected
+1453-05-1_18-18-02_FIICODE_CONTENT.txt,True
+2023-01-01_18-18-02_FIICODE_CONTENT.txt,True
+2024-02-1_18-18-02_FIICODE_CONTENT.txt,True
+2024-09-30_18-18-02_FIICODE_CONTENT.txt,True
+2025-01-16_18-18-02_FIICODE_CONTENT.txt,True
+2025-02-16_18-18-02_FIICODE_CONTENT.txt,True
+barr.txt,False
+booo---.txt,False
+boo_--_.txt,False
+fooo-bar.txt,False
+fooo.txt,False
+frunza.aleaxndru.drip.txt,False
+
+
