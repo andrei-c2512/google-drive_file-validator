@@ -52,10 +52,11 @@ To be more precise:
 
 ### How to use:
 ```shell
-   python3 src/main.py -d <drive_id> -f <folder_id> -l <lifetime> -p <date_pattern>
+   python3 src/main.py validate -d <drive_id> -f <folder_id> 
+   -l <lifetime> -p <date_pattern> -g <glob_expression> -r <regex>
 ```
 Flags explained:
-- `-d/--driveId`  -> specify the target drive that you want the process to run on
+- `-d/--driveId` -> specify the target drive that you want the process to run on
 - `-f/--folderId` -> specify the target folder from within a drive
 - `-l/--lifetime` -> set the max lifetime of the files that are not going to be deleted. You can disable lifetime check by setting it `0`
 - `-p/--pattern`  -> provide a pattern that is going to save files from being delete  
@@ -85,13 +86,16 @@ To see all the variables in the config file , please use the following:
 `python3 src/main.py config --list`
 
 To set a variable from within the terminal, use:  
-`python3 src/main.py <VAR_1>=<VALUE_1>  <VAR_2>=<VALUE_2> ... (you can list as much as you like)`
+```shell 
+python3 src/main.py config <VAR_1>=<VALUE_1>  <VAR_2>=<VALUE_2> ... 
+# you can list as much as you like
+```
 
 ## Development:
 
 ### General:
 - if you are in ASII and need some features , ask me or request to make you a collaborator
-- contact me or Frunza Alexandru if you have a problem with setting up a Service Account
+- contact [me](https://github.com/andrei-c2512) or [Frunza Alexandru](https://github.com/alexfrunza) if you have a problem with setting up a Service Account
 - if you develop on a different system , please add the set-up as a rule in the `makefile`  
 
 ### Coding practices:
