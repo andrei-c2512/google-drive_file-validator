@@ -10,17 +10,22 @@ class ConfigFileManager:
         self.file_vars : dict[str, str] = {}
         with open(path , 'r') as file:
             file.seek(0)
-            for line in file: 
-                if line[0] == '#':
+            for line in file:
+                line = line.lstrip()
+                if len(line) != 0 and line[0] == '#':
                     continue 
                 parts = line.split(':', 1)
                 if len(parts) != 2:
-                    continue;
+                    continue
+
+                parts[1] = parts[1].lstrip()
+
                 # we remove the end of line character if it has one , because it is annoying
-                if parts[1][len(parts[1]) -1] == '\n':
+                if len(parts[1]) != 0 and parts[1][len(parts[1]) -1] == '\n':
                     parts[1] = parts[1][:-1]
-                self.file_vars.update( { parts[0] : parts[1]})
                 
+                self.file_vars.update( { parts[0] : parts[1]})
+
         return            
 
     def set_var(self , name : str , new_val : str) -> bool:

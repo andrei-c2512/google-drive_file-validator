@@ -17,7 +17,7 @@ def build_validate_parser(subparser):
 
     validate_parser.add_argument("-l" , "--lifetime" , required=False , default=manager.get_var("LIFETIME"),
                                  help ="The lifetime of the files")
-    validate_parser.add_argument("-p" , "--pattern" , required=False , default=manager.get_var("PATTERN"), 
+    validate_parser.add_argument("-p" , "--pattern" , required=False , default=manager.get_var("DATE_PATTERN"), 
                                  help="The pattern of the files that are going to be saved" " despite being expired.\n "
                                       "The pattern is the following: YYYY-MM-DD")
 
@@ -25,6 +25,10 @@ def build_validate_parser(subparser):
                                  help="If this flag is used,  it does not ask you to confirm the files you want to delete",
                                  action="store_true",
                                  required=False)
+    validate_parser.add_argument("-g" , "--glob" , required=False, default=manager.get_var("GLOB"),
+                                 help="Specifies the glob pattern that is going to be used on each file")
+    validate_parser.add_argument("-r" , "--regex" , required=False , default=manager.get_var("REGEX"),
+                                 help="Specifies the regex that is going to be used on each file")
 
     validate_parser.set_defaults(func=validate_a)
     return

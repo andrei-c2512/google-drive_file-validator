@@ -1,6 +1,7 @@
 #!/bin/bash
 export PYTHONCACHEPREFIX=./build
 
+PY=python3
 SRC=src/main.py
 TEST_SRC=src/tests.py
 DRIVE_ID=0ANtwa3WJVNrUUk9PVA 
@@ -22,11 +23,14 @@ set-up-pip:
 	@echo "This only works if you already have python and pip installed"
 	pip install $(LIBS_PIP)
 
+config:
+	$(PY) $(SRC) config DRIVE_ID=$(DRIVE_ID) 
+
 single:
-	python3  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
+	$(PY)  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
 tests:
-	python3 $(TEST_SRC) 	
+	$(PY) $(TEST_SRC) 	
 sample:
-	python3  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
-	python3  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_2) --lifetime 30 -p 231231231 
+	$(PY)  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
+	$(PY)  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_2) --lifetime 30 -p 231231231 
 

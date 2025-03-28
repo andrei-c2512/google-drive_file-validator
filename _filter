@@ -123,8 +123,9 @@ class FileFilter:
         passed : bool = True
         for i in range(0 , 3):
             passed = (passed and self.date_field_match(date_pattern_fields[i], self.date_fields[i]))
-       
-        # if it passed the test , then it needs to be skipped
+        
+        
+        # if it passed the test , then it means it needs to be skipped
         return passed == False
     #
     def regex_filter(self) -> bool:
@@ -140,8 +141,6 @@ class FileFilter:
         if log_errors == True and len(self.error_message) != 0:
             logging.error(self.error_message)
         #
-        if log_errors == True and result == False and len(self.error_message) == 0:
-            logging.error(f"File '{self.error_message}' was skipped due to unknown reasons")
         return result
     #
 #
@@ -200,8 +199,7 @@ def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str ,
         if len(invalid_file_list) == 0:
             print("No files are going to be deleted")
             return
-        else:
-            print_drive_files(invalid_file_list , ['name'])
+
         user_input = "joe"
         while (user_input[0] == "y" or user_input[0] == "n") == False:
             user_input = input("The files listed above are going to be deleted. Are you sure? [y/n]: ")
@@ -217,4 +215,4 @@ def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str ,
     except HttpError as error:
         # TODO(developer) - Handle errors from drive API.
         logging.error(f"An error occurred: {error}")
-#
+

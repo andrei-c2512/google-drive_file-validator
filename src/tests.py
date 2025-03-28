@@ -87,8 +87,11 @@ def main():
     manager = ConfigFileManager(f"{CREDENTIALS_FOLDER}/config.config")
     manager.print_data()
     
-    manager.set_var("PATTERN", "2024-12-13")
+    manager.set_var("PATTERN", "MMMM-DD-NN")
     basic_name_test("Test 1" , True)
+    
+    filter = FileFilter("2023-01-01_18-18-02_FIICODE_CONTENT.txt" , 0 , date_pattern="2024-12-13", glob_pattern="*.txt" )
+    print(filter.is_valid())
 #
 
 if __name__ == "__main__":

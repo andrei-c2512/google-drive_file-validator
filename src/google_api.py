@@ -59,7 +59,8 @@ def get_drive_files(drive_service, drive_id: str , folder_id : str):
         query = "trashed=false" 
     else:
         query= f"trashed=false and '{folder_id}' in parents"
-
+    
+    print(query)
     response = (
         drive_service.files()
         .list(
