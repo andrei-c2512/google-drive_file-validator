@@ -3,4 +3,5 @@
 
 # sensitive information
 *credentials.json
-
+*env
+*junk

@@ -1,36 +1,48 @@
 #!/bin/bash
-export PYTHONCACHEPREFIX=./build
+VIRTUAL_DIR=env
+PY=$(VIRTUAL_DIR)/bin/python3
+PIP=$(VIRTUAL_DIR)/bin/pip
 
-PY=python3
-SRC=src/main.py
+MODULE=src
 TEST_SRC=src/tests.py
 DRIVE_ID=0ANtwa3WJVNrUUk9PVA 
 FOLDER_ID_1=1Rq8uetK6bnE6RrzMzf1QRBLUfRVSov8A 
 FOLDER_ID_2=1IluQF5LFvOshpHJNTl4IIF30EEIS2akm
 
 
-LIBS_COMMON=google-auth-oauthlib google-auth-httplib2 oauth2client
-LIBS_DEBIAN=googleapi $(LIBS_COMMON)
-LIBS_PIP=google-api-python-client $(LIBS_COMMON)
+LIBS=google-auth-oauthlib google-auth-httplib2 oauth2client google-api-python-client 
 
 
 .PHONY: tests
 
-set-up-debian:
-	sudo apt install python
-	sudo apt install $(addprefix python3-,$(LIBS_DEBIAN))
-set-up-pip:
-	@echo "This only works if you already have python and pip installed"
-	pip install $(LIBS_PIP)
+RUN=$(PY) -m $(MODULE)
 
+
+set-up-deb:
+	@echo "Installing python"
+	sudo apt install python3
+	@echo "Installing python virtual enviroment"
+	sudo apt install python3.11-venv
+	@echo "Creating a virtual enviroment called "$(VIRTUAL_DIR)""
+	$(PY) -m venv $(VIRTUAL_DIR)	
+	@echo "Installing the 3rd party libraries"
+	$(PIP) install $(LIBS)
+	@echo "Done"
+set-up-win:	
+	$(PY) -m venv $(VIRTUAL_DIR)	
+	@echo "Installing the 3rd party libraries"
+	$(PIP) install $(LIBS)
+	@echo "Done"
 config:
-	$(PY) $(SRC) config DRIVE_ID=$(DRIVE_ID) 
+	$(RUN) config DRIVE_ID=$(DRIVE_ID) 
 
 single:
-	$(PY)  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
+	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
+
 tests:
 	$(PY) $(TEST_SRC) 	
+
 sample:
-	$(PY)  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
-	$(PY)  $(SRC) validate -d $(DRIVE_ID) -f $(FOLDER_ID_2) --lifetime 30 -p 231231231 
+	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
+	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_2) --lifetime 30 -p 231231231 
 

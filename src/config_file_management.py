@@ -1,7 +1,8 @@
 import logging
+from . import globals
 # this class manager a .config file. It works in a simple way: since everything is stored in a key value pair(in the file)
 # I do that as well here. If you modify a file variable here , it will modify it in the file
-class ConfigFileManager:
+class ConfigFileReader:
     def __init__(self , path):
         self.path : str = path
 
@@ -14,7 +15,7 @@ class ConfigFileManager:
                 line = line.lstrip()
                 if len(line) != 0 and line[0] == '#':
                     continue 
-                parts = line.split(':', 1)
+                parts = line.split('=', 1)
                 if len(parts) != 2:
                     continue
 
@@ -28,14 +29,24 @@ class ConfigFileManager:
 
         return            
 
+    def get_var(self , name : str) -> str:
+        return self.file_vars[name]
+    
+    def print_data(self) -> None:
+        for key , value in self.file_vars.items():
+            logging.info(f"{key} : {value}")
+        return
+    #
+   
+#
+class ConfigFileWriter(ConfigFileReader):
     def set_var(self , name : str , new_val : str) -> bool:
-
         file_data : str = ""
         found : bool = False
         with open(self.path , 'r+') as file:
             for line in file: 
                 if line.find(name) != -1:
-                    line = f"{name}: {new_val}\n"
+                    line = f"{name}={new_val}\n"
                     found = True
                     # we do not exit the loop because we still add every line of the config line in the string
 
@@ -74,20 +85,10 @@ class ConfigFileManager:
             logging.info(f"{failed_ops} operation{plural} failed. {success_cnt} succeeded.")
         return
     #
-    def get_var(self , name : str) -> str:
-        return self.file_vars[name]
-    
-    def print_data(self) -> None:
-        for key , value in self.file_vars.items():
-            logging.info(f"{key} : {value}")
+    @staticmethod
+    def update_config(args):
+        config_file = ConfigFileWriter(globals.CONFIG_PATH)
+        config_file.set_vars(args.expressions)
         return
     #
-   
-#
-
-# the arguments are interpreted as <VAR>=<VAL> expressions
-def process_config_expressions(args):
-    config_file = ConfigFileManager("./res/config.config")
-    config_file.set_vars(args.expressions)
-    return
 #

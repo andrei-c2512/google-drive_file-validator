@@ -1,4 +1,4 @@
-from google_api import *
+from . import google_api 
 import logging
 import os
 import datetime
@@ -186,10 +186,10 @@ def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str ,
 
     # the actual validation 
     try:
-        service = build_service()
-        items = get_drive_files(service, drive_id , folder_id)
+        service = google_api.build_service()
+        items = google_api.get_drive_files(service, drive_id , folder_id)
         for item in items:
-            print_params(item)
+            google_api.print_params(item)
 
         if not items:
             logging.info("No files found.")
@@ -201,7 +201,7 @@ def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str ,
             print("No files are going to be deleted")
             return
         else:
-            print_drive_files(invalid_file_list , ['name'])
+            google_api.print_drive_files(invalid_file_list , ['name'])
         user_input = "joe"
         while (user_input[0] == "y" or user_input[0] == "n") == False:
             user_input = input("The files listed above are going to be deleted. Are you sure? [y/n]: ")
@@ -214,7 +214,7 @@ def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str ,
         else:
             print("Deletion canceled. Exiting the program...")
 
-    except HttpError as error:
+    except google_api.HttpError as error:
         # TODO(developer) - Handle errors from drive API.
         logging.error(f"An error occurred: {error}")
 #
