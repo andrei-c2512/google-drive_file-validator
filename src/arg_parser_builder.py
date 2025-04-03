@@ -34,6 +34,7 @@ def build_validate_parser(subparser):
 def build_config_parser(subparser) -> None:
     config_parser = subparser.add_parser("config" , help="Set certain variables in the config file")
     config_parser.add_argument("expressions" , nargs="*", help = "List of expressions")
+    config_parser.add_argument("-l","--list",required=False, action="store_true",help="List all of the config file contents")
     config_parser.set_defaults(func=ConfigFileWriter.update_config)
     return
 #

@@ -1,4 +1,5 @@
 import os
+import logging
 from . import globals
 from .config_file_management import ConfigFileReader
 
@@ -24,6 +25,16 @@ class ConfigVars:
             ConfigVars.defaults[key] = new_val
         #
     #
+    @staticmethod
+    def print_defaults() -> None:
+        output_str : str = ""
+        for key , value in ConfigVars.defaults.items():
+            output_str += key + "=" + value +'\n'
+        #
+    #
+
+            
+
 
 
 

@@ -89,6 +89,8 @@ class ConfigFileWriter(ConfigFileReader):
     def update_config(args):
         config_file = ConfigFileWriter(globals.CONFIG_PATH)
         config_file.set_vars(args.expressions)
+        if args.list == True:
+            config_file.print_data()
         return
     #
 #

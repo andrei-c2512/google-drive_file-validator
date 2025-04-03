@@ -5,7 +5,9 @@ import datetime
 import fnmatch
 import re
 
-
+# I recommned only running is_valid() as every function does a small part in processing the string
+# one maybe gets the date fields , the other just splits everything up etc. They all depend on each other by running in 
+# a particular order, so that we save ourselves from exceptions
 class FileFilter:
     def __init__(self , file_name :str , lifetime : int , date_pattern : str , regex : str = "" , glob_pattern : str = ""):
         self.file_name = file_name
@@ -62,14 +64,22 @@ class FileFilter:
 
     @staticmethod 
     def date_field_match( field : str , val : str) -> bool:
-       if len(field) != len(val):
-           return False
+       j = len(field) - 1
+       # if the value is shorter than the field then we prepend to it until they are equal
+       while len(val) != len(field):
+           # F stands for filler
+           val = "F" + val
 
-       for i in range(0, len(field)):
-           if field[i].isnumeric() and field[i] != val[i]:
+       for i in range(len(val) - 1, -1 , -1):
+           # print(f"Comparing {field[j]} to {val[i]}")
+           if field[j].isnumeric() and field[j] != val[i]:
                return False
            #
+           j -= 1
+           if j == -1:
+               break
         #
+       
        return True
     #
     def value_filter(self) -> bool:
@@ -101,20 +111,20 @@ class FileFilter:
     # it will still not be deleted
     def lifetime_filter(self) -> bool:
         if self.lifetime == 0:
-            return True
+            return self.date_filter()
         if self.date_filter() == True:
             return True
         
         current_date: datetime.datetime = datetime.datetime.now()
 
         file_lifetime: int = (current_date.date() - self.date).days
-        return file_lifetime < self.lifetime
+        return file_lifetime >= self.lifetime
     #
     def glob_filter(self) -> bool:
         if len(self.glob_pattern) == 0:
             return True
         else:
-            return fnmatch.fnmatch(self.file_name, self.glob_pattern)
+            return fnmatch.fnmatch(self.file_name, self.glob_pattern) == False
     #
 
     def date_filter(self) -> bool:
@@ -125,24 +135,29 @@ class FileFilter:
             passed = (passed and self.date_field_match(date_pattern_fields[i], self.date_fields[i]))
        
         # if it passed the test , then it needs to be skipped
-        return passed == False
+        # print(f"Returning {passed} for {date_pattern_fields}")
+        return passed 
     #
     def regex_filter(self) -> bool:
         if len(self.regex) == 0:
             return True
         else:
-            return re.fullmatch(self.regex , self.file_name) != None
+            return re.fullmatch(self.regex , self.file_name) == None
     #
     def is_valid(self, log_errors : bool = True) -> bool:
-        result  = self.glob_filter() and self.pattern_filter() and self.value_filter() \
-                and self.date_filter() and self.lifetime_filter() and self.glob_filter() and self.regex_filter()
+        pipeline = [ self.pattern_filter,  self.value_filter , self.lifetime_filter , self.glob_filter , self.regex_filter]
+        passed : bool = True
+        print(self.file_name)
+        for func in pipeline:
+            passed = passed and func()
 
+        print(self.error_message)
         if log_errors == True and len(self.error_message) != 0:
             logging.error(self.error_message)
         #
-        if log_errors == True and result == False and len(self.error_message) == 0:
+        if log_errors == True and passed == False and len(self.error_message) == 0:
             logging.error(f"File '{self.error_message}' was skipped due to unknown reasons")
-        return result
+        return passed
     #
 #
 
@@ -155,7 +170,7 @@ def find_invalid_files(file_list , lifetime : int, pattern : str):
             # splits the name into two (name and extension), we store the name
             file_name = os.path.splitext(file_item["name"])[0]
             filter = FileFilter(file_name , lifetime , pattern)
-            if filter.is_valid():
+            if filter.is_valid() == False:
                 invalid_file_list.append(file_item)
 
         except Exception as e:

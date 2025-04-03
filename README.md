@@ -4,7 +4,7 @@
 
 1. [Set-up](#set-up)
 2. [Usage](#usage)
-3. [For developers](#developement)
+3. [Development](#development)
  
 
 ## Set-up:
@@ -80,7 +80,7 @@ Example of a glob expression. Similar to the ones you use `grep`/`find` or anyth
 ### The `config` command
 
 Every flag specified above is *optional*. If a flag is not present , the it will get it's default value from:  
-`./res/config.config`
+`./res/config.sh`
 
 To see all the variables in the config file , please use the following:  
 `python3 src/main.py config --list`

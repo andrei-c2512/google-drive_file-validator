@@ -1,0 +1,9 @@
+input,expected
+2025-2-1_23-43-12_Something,False
+2025-3-3_23-43-12_Something,False
+2025-1-1_23-43-12_Something,False
+2025-2-14_23-43-12_Something,True
+1989-7-21_23-43-12_Something,False
+2014-1-10_23-43-12_Something,True
+2019-9-10_23-43-12_Something,True
+2025-2-1_23-43-12_Something,False
