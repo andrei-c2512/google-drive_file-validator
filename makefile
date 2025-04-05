@@ -55,7 +55,7 @@ TREE_IGNORE=$(VIRTUAL_DIR)|__pycache__
 
 # Utility rules
 dep-list:
-	$(PIP) list > requirements.txt
+	$(PIP) freeze && $(PIP) list > requirements.txt
 
 ## this is for the tree command I have on linux
 tree:

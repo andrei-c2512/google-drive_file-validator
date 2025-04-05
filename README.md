@@ -34,7 +34,7 @@ To let the program access your account , please create a valid JWT for it. To do
 
 ```shell
     # if you are on anything that uses pip
-    make set-up-pip
+    make set-up-win
     # if you are on debian(the system that I developed on)
     make set-up-debian
 ```
