@@ -33,34 +33,65 @@ class FileFilter:
         return 
     #
     def pattern_filter(self) -> bool:
-        error_message : str = f"File {self.file_name} was skipped because of invalid pattern: A valid pattern is: "
+        valid : bool = True
+
+        error_message : str = f"[WARNING]File {self.file_name} has invalid pattern: A valid pattern is: "
         error_message += "{}"
         file_metadata = self.file_name.split("_", 2)
         if len(file_metadata) < 3:
             self.add_error(error_message.format("<date>_<time>_<name>"))
-            return False
+            return valid
         self.string = file_metadata[2]
         
         self.date_fields = file_metadata[0].split("-", 2)
         if len(self.date_fields) < 3:
             self.add_error(error_message.format("YYYY-MM-DD"))
-            return False
+            return valid
         # 
         self.time_fields = file_metadata[1].split("-", 2)
         if len(self.date_fields) < 3:
             self.add_error(error_message.format("HH-MM-SS"))
-            return False
+            return valid
         #
 
         return True
     #
     def date_time_test(self , begin : int , end : int , value : int , field_name : str) -> bool:
-        if (value in range(begin , end)) == False:
+        if (value in range(begin , end)) == True:
             self.add_error(f"The {field_name} field has an invalid value")
-            return False
+            return True
         #
         return True
     #
+
+    def value_filter(self) -> bool:
+        # TO DO: force prerequisite test 
+        try:
+            hours : int = int(self.time_fields[0])
+            minutes : int = int(self.time_fields[1])
+            seconds : int = int(self.time_fields[2])
+        
+            year : int = int(self.date_fields[0])
+            month : int = int(self.date_fields[1])
+            day : int = int(self.date_fields[2])
+
+            passed : bool = self.date_time_test(0 , 24, hours , "hours") and \
+                    self.date_time_test(0 , 60, minutes, "minutes") and      \
+                    self.date_time_test(0, 60 , seconds, "seconds") and      \
+                    self.date_time_test(1 , 13, month , "months") and \
+                    self.date_time_test(1 , 32 , day,  "days")
+
+            self.time = datetime.time(hours , minutes , seconds)
+            self.date = datetime.date(year , month , day)
+
+        except ValueError as e:
+            self.add_error(f"File {self.file_name} has invalid date/time values:" + str(e))
+            return True
+        #
+        return passed
+    #
+    # warning: the date filter will be run inside this function , meaning that , if it respects the date pattern, even if the file is too old
+    # it will still not be deleted
 
     @staticmethod 
     def date_field_match( field : str , val : str) -> bool:
@@ -82,33 +113,6 @@ class FileFilter:
        
        return True
     #
-    def value_filter(self) -> bool:
-        # TO DO: force prerequisite test 
-        try:
-            hours : int = int(self.time_fields[0])
-            minutes : int = int(self.time_fields[1])
-            seconds : int = int(self.time_fields[2])
-        
-            year : int = int(self.date_fields[0])
-            month : int = int(self.date_fields[1])
-            day : int = int(self.date_fields[2])
-
-            passed : bool = self.date_time_test(0 , 24, hours , "hours") and \
-                    self.date_time_test(0 , 60, minutes, "minutes") and      \
-                    self.date_time_test(0, 60 , seconds, "seconds") and      \
-                    self.date_time_test(1 , 13, month , "months") and \
-                    self.date_time_test(0 , 32 , day,  "days")
-
-            self.time = datetime.time(hours , minutes , seconds)
-            self.date = datetime.date(year , month , day)
-        except ValueError as e:
-            self.add_error(f"File {self.file_name} was skipped:" + str(e))
-            return False
-        #
-        return passed
-    #
-    # warning: the date filter will be run inside this function , meaning that , if it respects the date pattern, even if the file is too old
-    # it will still not be deleted
     def lifetime_filter(self) -> bool:
         if self.lifetime == 0:
             return self.date_filter()
@@ -128,12 +132,16 @@ class FileFilter:
     #
 
     def date_filter(self) -> bool:
-        date_pattern_fields = self.date_pattern.split('-', 2)
+        try:
+            date_pattern_fields = self.date_pattern.split('-', 2)
 
-        passed : bool = True
-        for i in range(0 , 3):
-            passed = (passed and self.date_field_match(date_pattern_fields[i], self.date_fields[i]))
-       
+            passed : bool = True
+            for i in range(0 , 3):
+                passed = (passed and self.date_field_match(date_pattern_fields[i], self.date_fields[i]))
+        except Exception as e:
+            self.add_error(str(e))
+            return True
+
         # if it passed the test , then it needs to be skipped
         # print(f"Returning {passed} for {date_pattern_fields}")
         return passed 
@@ -151,7 +159,7 @@ class FileFilter:
         for func in pipeline:
             passed = passed and func()
 
-        print(self.error_message)
+        
         if log_errors == True and len(self.error_message) != 0:
             logging.error(self.error_message)
         #

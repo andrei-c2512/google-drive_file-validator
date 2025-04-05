@@ -47,13 +47,16 @@ class ConfigFileWriter(ConfigFileReader):
             for line in file: 
                 if line.find(name) != -1:
                     line = f"{name}={new_val}\n"
+                    self.file_vars[name] = new_val
                     found = True
                     # we do not exit the loop because we still add every line of the config line in the string
 
                 file_data += line            
             #
         #
+       
         
+
         if found == False:
             logging.error(f"The variable {name} does not exist")
             return False
