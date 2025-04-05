@@ -1,6 +1,7 @@
 # native libraries
 import sys
 import logging
+import os
 # external libraries
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
@@ -12,7 +13,8 @@ REQUESTED_FILE_PARAMS = ["id", "name", "parents", "driveId"]
 
 
 def build_service():
-    return build("drive", "v3", credentials=get_credential("res/credentials.json"))
+    credential = "SERVICE_ACCOUNT_KEY"
+    return build("drive", "v3", credentials=get_credential(str(os.environ.get(credential, "res/credentials.json"))))
 
 def file_params_string():
     result = ""
@@ -54,11 +56,9 @@ def get_credential(service_account_key_file: str):
 
 
 def get_drive_files(drive_service, drive_id: str , folder_id : str):
-    query : str = ""
-    if folder_id == "NULL":
-        query = "trashed=false" 
-    else:
-        query= f"trashed=false and '{folder_id}' in parents"
+    query : str = "mimeType != 'application/vnd.google-apps.folder' and trashed=false" 
+    if folder_id != "NULL":
+        query= query + f" and '{folder_id}' in parents"
     
     print(query)
     response = (
