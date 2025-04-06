@@ -107,11 +107,13 @@ class FileFilter:
            # print(f"Comparing {field[j]} to {val[i]}")
            if field[j].isnumeric() and field[j] != val[i]:
                self.add_debug_message(config.DELETE_ON_DATE_PATTERN, f"Pattern {field} does not match {val}. If you see any new Fs , they are filler")
+               return False
            #
            j -= 1
            if j == -1:
                break
-        #
+       #
+       return True
     #
     def lifetime_filter(self): 
         current_date: datetime.datetime = datetime.datetime.now()
@@ -138,16 +140,20 @@ class FileFilter:
         #
         return True
     #
-    def date_filter(self):
+    def date_filter(self) -> bool: 
         try:
             date_pattern_fields = self.date_pattern.split('-', 2)
             if FileFilter.is_default_date_pattern(date_pattern_fields):
-                return
+                return True
 
+            valid = True
             for i in range(0 , 3):
-                self.date_field_match(date_pattern_fields[i], self.date_fields[i])
+                valid = valid and self.date_field_match(date_pattern_fields[i], self.date_fields[i])
+
+            return valid
         except Exception as e:
             self.add_debug_message(config.DELETE_ON_DATE_PATTERN , str(e))
+            return False
 
     #
     def regex_filter(self):
@@ -158,12 +164,20 @@ class FileFilter:
         #
     #
     def is_valid(self) -> bool:
-        pipeline = [ self.format_filter,  self.value_filter , self.lifetime_filter , self.date_filter , self.glob_filter , self.regex_filter]
+        pipeline = [ self.format_filter,  self.value_filter , self.lifetime_filter , self.glob_filter , self.regex_filter]
         for func in pipeline:
             func()
-       
-        self.log_all()
+        
+        if self.date_filter() == True:
+            self.log_all()
+            return True
 
+        elif config.DELETE_ON_DATE_PATTERN != 0: 
+            self.log_all()
+            return False
+
+        self.log_all()
+        
         return self.error_mask == 0b0
     #
     def log_all(self):

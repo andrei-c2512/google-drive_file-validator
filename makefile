@@ -40,7 +40,7 @@ config:
 	$(RUN) config --list DRIVE_ID=$(DRIVE_ID) DATE_PATTERN=YYYY-MM-DD
 
 single:
-	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p YYYY-MM-DD
+	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p YYYY-MM-15
 
 tests:
 	$(PY) -m unittest tests/test_file_filter.py
