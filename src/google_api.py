@@ -1,3 +1,4 @@
+import config
 # native libraries
 import sys
 import logging
@@ -13,8 +14,7 @@ REQUESTED_FILE_PARAMS = ["id", "name", "parents", "driveId"]
 
 
 def build_service():
-    credential = "SERVICE_ACCOUNT_KEY"
-    return build("drive", "v3", credentials=get_credential(str(os.environ.get(credential, "res/credentials.json"))))
+    return build("drive", "v3", credentials=get_credential(str(os.environ.get(config.CREDENTIAL_VAR, config.DEFAULT_CREDENTIALS_PATH))))
 
 def file_params_string():
     result = ""
@@ -32,6 +32,13 @@ def print_params(item, param_list = REQUESTED_FILE_PARAMS):
         result += "\n"
 
     logging.info(result)
+def param_stream(item , param_list = REQUESTED_FILE_PARAMS):
+    result: str = "\n" 
+    for param in param_list:
+        result += param + " : " 
+        result += str(item[param])
+        result += "\n"
+    return result
 
 def get_credential(service_account_key_file: str):
     """Creates a Credential object with the correct OAuth2 authorization.
@@ -49,7 +56,7 @@ def get_credential(service_account_key_file: str):
     )
 
     if not credential or credential.invalid:
-        print("Unable to authenticate using service account key.")
+        logging.error("Unable to authenticate using service account key.")
         sys.exit(1)
 
     return credential
@@ -60,7 +67,6 @@ def get_drive_files(drive_service, drive_id: str , folder_id : str):
     if folder_id != "NULL":
         query= query + f" and '{folder_id}' in parents"
     
-    print(query)
     response = (
         drive_service.files()
         .list(
@@ -79,11 +85,13 @@ def get_drive_files(drive_service, drive_id: str , folder_id : str):
 
 
 def print_drive_files(file_list, params = REQUESTED_FILE_PARAMS):
+    result = ""
     if len(file_list) == 0:
         logging.info("The target destination has no files")
         return
     else:
-        logging.info("Files:")
+        result +="Files:\n"
     for item in file_list:
-        print_params(item , params)
+        result += param_stream(item , params)
+    logging.info(result)
 

@@ -1,5 +1,5 @@
 import logging
-from . import globals
+import config
 # this class manager a .config file. It works in a simple way: since everything is stored in a key value pair(in the file)
 # I do that as well here. If you modify a file variable here , it will modify it in the file
 class ConfigFileReader:
@@ -90,7 +90,7 @@ class ConfigFileWriter(ConfigFileReader):
     #
     @staticmethod
     def update_config(args):
-        config_file = ConfigFileWriter(globals.CONFIG_PATH)
+        config_file = ConfigFileWriter(config.CONFIG_PATH)
         config_file.set_vars(args.expressions)
         if args.list == True:
             config_file.print_data()

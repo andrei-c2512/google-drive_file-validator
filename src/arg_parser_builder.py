@@ -1,7 +1,7 @@
 import argparse
-from .config_vars import ConfigVars
-from .config_file_management import ConfigFileWriter
-from . import file_filter 
+from config_vars import ConfigVars
+from config_file_management import ConfigFileWriter
+import file_filter 
 
 def build_validate_parser(subparser):
 

@@ -1,7 +1,6 @@
 import os
-import logging
-from . import globals
-from .config_file_management import ConfigFileReader
+import config
+from config_file_management import ConfigFileReader
 
 class ConfigVars:
     defaults : dict[str, str] = {}
@@ -15,7 +14,7 @@ class ConfigVars:
 
     @staticmethod
     def run():
-        reader = ConfigFileReader(globals.CONFIG_PATH)
+        reader = ConfigFileReader(config.CONFIG_PATH)
         for key in ConfigVars.defaults:
             new_val : str = ""
             if key in os.environ:

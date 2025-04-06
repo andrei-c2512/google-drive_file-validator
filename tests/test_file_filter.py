@@ -12,7 +12,7 @@ class TestFilter(unittest.TestCase):
             reader=csv.DictReader(file)
             for row in reader:
                 filter = FileFilter(row["input"] , f_lifetime , f_date , f_regex , f_glob)
-                test_result = str(filter.is_valid(log_errors = False))
+                test_result = str(filter.is_valid())
                 self.assertEqual(test_result , row["expected"], 
                                  msg=f"Expected {row['input']} to be {row['expected']}\n"
                                  f"lifetime={f_lifetime}\n"

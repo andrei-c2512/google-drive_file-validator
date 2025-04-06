@@ -4,7 +4,6 @@
 VIRTUAL_DIR=env
 PY=$(VIRTUAL_DIR)/bin/python3
 PIP=$(VIRTUAL_DIR)/bin/pip
-TEST_SRC=src/tests.py
 
 .PHONY: tests
 # 
@@ -18,12 +17,12 @@ set-up-deb:
 	@echo "Installing python virtual enviroment"
 	sudo apt install python3.11-venv
 	@echo "Creating a virtual enviroment called "$(VIRTUAL_DIR)""
-	$(PY) -m venv $(VIRTUAL_DIR)	
+	python3 -m venv $(VIRTUAL_DIR)	
 	@echo "Installing the 3rd party libraries"
 	$(PIP) install $(LIBS)
 	@echo "Done"
 set-up-win:	
-	$(PY) -m venv $(VIRTUAL_DIR)	
+	py -m venv $(VIRTUAL_DIR)	
 	@echo "Installing the 3rd party libraries"
 	$(PIP) install $(LIBS)
 	@echo "Done"
@@ -33,15 +32,15 @@ DRIVE_ID=0ANtwa3WJVNrUUk9PVA
 # 0ANtwa3WJVNrUUk9PVA 
 FOLDER_ID_1=1Rq8uetK6bnE6RrzMzf1QRBLUfRVSov8A 
 FOLDER_ID_2=1IluQF5LFvOshpHJNTl4IIF30EEIS2akm
-MODULE=src
-RUN=$(PY) -m $(MODULE)
+SRC=src/main.py
+RUN=$(PY) $(SRC)
 
 # Running rules for quick tests and testing itself
 config:
-	$(RUN) config --list DRIVE_ID=$(DRIVE_ID) 
+	$(RUN) config --list DRIVE_ID=$(DRIVE_ID) DATE_PATTERN=YYYY-MM-DD
 
 single:
-	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
+	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p YYYY-MM-DD
 
 tests:
 	$(PY) -m unittest tests/test_file_filter.py
