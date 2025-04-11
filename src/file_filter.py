@@ -17,14 +17,14 @@ class FileFilter:
         self.file_metadata : list[str] = []
         self.date_fields : list[str] = []
         self.time_fields : list[str] = []
-        self.time : datetime.time 
+        self.time : datetime.time = datetime.time()
+        self.date: datetime.date = datetime.date(2025 , 1 , 1)
         self.name : str = ""
         self.error_message : str = ""
         self.warning_message : str = ""
         self.regex = regex
 
         self.error_mask = 0b0
-
     #
     @staticmethod
     def append_to_message(src : str , message : str) -> str:
@@ -89,7 +89,7 @@ class FileFilter:
 
             self.time = datetime.time(hours , minutes , seconds)
             self.date = datetime.date(year , month , day)
-        except ValueError as e:
+        except Exception as e:
             self.add_debug_message(config.DELETE_ON_VALUE, f"File {self.file_name} has invalid date/time values:" + str(e))
         #
     #
@@ -163,42 +163,43 @@ class FileFilter:
             #
         #
     #
-    def is_valid(self) -> bool:
+    def is_valid(self, Wall : bool) -> bool:
         pipeline = [ self.format_filter,  self.value_filter , self.lifetime_filter , self.glob_filter , self.regex_filter]
         for func in pipeline:
             func()
+       
         
+        result : bool = self.error_mask == 0b0
+
         if self.date_filter() == True:
-            self.log_all()
-            return True
+            result = True
 
         elif config.DELETE_ON_DATE_PATTERN != 0: 
-            self.log_all()
-            return False
-
-        self.log_all()
-        
-        return self.error_mask == 0b0
+            result = False
+         
+        print(result)
+        self.log_all(Wall) 
+        return result
     #
-    def log_all(self):
+    def log_all(self, Wall):
         output : str = ""
         if len(self.error_message) == 0:
             output += f"The file {self.file_name} has no errors. \n"
         else:
             output += f"Errors for file {self.file_name}:\n" + self.error_message + '\n'
 
-
-        if len(self.warning_message) == 0:
-            output += f"The file {self.file_name} has no warnings. \n"
-        else:
-            output += f"Warnings for file {self.file_name}:\n" + self.warning_message + '\n'
+        if Wall:
+            if len(self.warning_message) == 0:
+                output += f"The file {self.file_name} has no warnings. \n"
+            else:
+                output += f"Warnings for file {self.file_name}:\n" + self.warning_message + '\n'
     
         
         logging.info(output)
 #
 
 
-def find_invalid_files(file_list , lifetime : int, pattern : str , glob : str, regex : str):
+def find_invalid_files(file_list , lifetime : int, pattern : str , glob : str, regex : str , Wall : bool):
     invalid_file_list = []
 
     for file_item in file_list:
@@ -206,7 +207,7 @@ def find_invalid_files(file_list , lifetime : int, pattern : str , glob : str, r
             # splits the name into two (name and extension), we store the name
             file_name = os.path.splitext(file_item["name"])[0]
             filter = FileFilter(file_name , lifetime , pattern , glob , regex)
-            if filter.is_valid() == False:
+            if filter.is_valid(Wall) == False:
                 invalid_file_list.append(file_item)
 
         except Exception as e:
@@ -222,10 +223,11 @@ def validate_a( args):
     validate(args.driveId , args.folderId ,
              int(args.lifetime) , args.pattern , 
              args.glob , args.regex, 
-             bool(args.force))
+             bool(args.force),
+             bool(args.Wall))
     return 
 #
-def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str , glob : str , regex : str, force : bool):
+def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str , glob : str , regex : str, force : bool , Wall : bool):
     # error checks
     if drive_id == "NULL":
         logging.error("Please provide a valid drive id , either directly by argument , or modify the configuration file")
@@ -240,21 +242,28 @@ def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str ,
     try:
         service = google_api.build_service()
         items = google_api.get_drive_files(service, drive_id , folder_id)
-        for item in items:
-            google_api.print_params(item)
+        if Wall:
+            for item in items:
+                google_api.print_params(item)
 
         if not items:
             logging.info("No files found.")
             return
 
-        invalid_file_list = find_invalid_files(items ,  lifetime ,pattern, glob , regex)
+        invalid_file_list = find_invalid_files(items ,  lifetime ,pattern, glob , regex , Wall)
         
         if len(invalid_file_list) == 0:
             print("No files are going to be deleted")
             return
         else:
             google_api.print_drive_files(invalid_file_list , ['name'])
-        
+
+        measure_type = google_api.MemMeasure.KB
+        deletion_size_str : str = "Size of files selected: " + str(
+                google_api.get_list_size(invalid_file_list, measure_type)) \
+                + measure_type.value[1]
+
+        logging.info(deletion_size_str)
         if force == False:
             user_input = "joe"
             while (user_input[0] == "y" or user_input[0] == "n") == False:
@@ -272,7 +281,7 @@ def validate( drive_id : str, folder_id : str , lifetime : int , pattern : str ,
             logging.info(f"Deleting {len(invalid_file_list)} files")
             for item in invalid_file_list:
                 logging.info(f"Deleting file {item['name']}")
-                service.file().delete(fileId=f"{item['id']}", supportsAllDrives=True).execute()
+                service.files().delete(fileId=f"{item['id']}", supportsAllDrives=True).execute()
 
     except google_api.HttpError as error:
         # TODO(developer) - Handle errors from drive API.

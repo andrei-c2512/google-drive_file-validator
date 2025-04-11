@@ -13,8 +13,24 @@ class ConfigVars:
     defaults.update({"DRIVE_ID":""})
 
     @staticmethod
-    def run():
+    def update_defaults(): 
+        if os.path.exists(config.CONFIG_PATH):
+            ConfigVars.update_by_all()
+        else:
+            ConfigVars.update_by_env()
+    #
+    @staticmethod
+    def update_by_env():
+        for key in ConfigVars.defaults:
+            if key in os.environ:
+                ConfigVars.defaults[key] = str(os.environ.get(key))
+            #
+        #
+    #
+    @staticmethod
+    def update_by_all():
         reader = ConfigFileReader(config.CONFIG_PATH)
+
         for key in ConfigVars.defaults:
             new_val : str = ""
             if key in os.environ:

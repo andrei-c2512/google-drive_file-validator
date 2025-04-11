@@ -17,7 +17,7 @@ class ConfigSanityChecker:
     #
     @staticmethod
     def run() -> None:
-        if os.path.exists(config.CONFIG_PATH):
+        if os.path.exists(config.CONFIG_PATH) == False:
             ConfigSanityChecker.create_default()
         else:
             # TO DO: make it run a validity check on the .sh file

@@ -7,7 +7,7 @@ import arg_parser_builder as cli
 # checks if a config.sh exists
 ConfigSanityChecker.run()
 # updates the variables in this order: enviroment -> config file -> hard coded values
-ConfigVars.run()
+ConfigVars.update_defaults()
 # logging set up
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("googleapiclient").setLevel(level=logging.ERROR)

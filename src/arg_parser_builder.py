@@ -1,6 +1,6 @@
 import argparse
-from config_vars import ConfigVars
-from config_file_management import ConfigFileWriter
+from config_vars import ConfigVars 
+from config_file_management import ConfigFileWriter 
 import file_filter 
 
 def build_validate_parser(subparser):
@@ -23,6 +23,12 @@ def build_validate_parser(subparser):
                                  help="If this flag is used,  it does not ask you to confirm the files you want to delete",
                                  action="store_true",
                                  required=False)
+
+    validate_parser.add_argument("--Wall" ,
+                                 help="If this flag is used, it shows you all the warnings",
+                                 action="store_true",
+                                 required=False)
+
     validate_parser.add_argument("-g" , "--glob" , required=False, default=ConfigVars.defaults["GLOB"],
                                  help="Specifies the glob pattern that is going to be used on each file")
     validate_parser.add_argument("-r" , "--regex" , required=False , default=ConfigVars.defaults["REGEX"],

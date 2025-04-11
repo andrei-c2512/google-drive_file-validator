@@ -2,6 +2,7 @@ import config
 # native libraries
 import sys
 import logging
+from enum import Enum
 import os
 # external libraries
 from googleapiclient.discovery import build
@@ -10,7 +11,14 @@ from googleapiclient.errors import HttpError
 
 SCOPE = "https://www.googleapis.com/auth/drive"
 
-REQUESTED_FILE_PARAMS = ["id", "name", "parents", "driveId"]
+REQUESTED_FILE_PARAMS = ["id", "name", "parents", "driveId","size"]
+
+class MemMeasure(Enum):
+    BYTES = (0 , "b")
+    KB = (1  , "Kb")
+    MB = (2 , "Mb")
+    GB = (3 , "Gb")
+
 
 
 def build_service():
@@ -82,6 +90,18 @@ def get_drive_files(drive_service, drive_id: str , folder_id : str):
     )
 
     return response.get("files", [])
+
+# this function assumes the files have the 'size' field
+def get_list_size(file_list, type : MemMeasure) -> float:
+    size : float = 0
+    for file in file_list: 
+        size += float(file['size'])
+
+    i = type.value[0]
+    while i != 0:
+        size = size / 1024
+        i -= 1
+    return size
 
 
 def print_drive_files(file_list, params = REQUESTED_FILE_PARAMS):

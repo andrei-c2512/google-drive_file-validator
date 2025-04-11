@@ -43,11 +43,13 @@ single:
 	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p YYYY-MM-15
 
 tests:
-	$(PY) -m unittest tests/test_file_filter.py
+	PYTHONPATH=src $(PY) -m unittest tests/test_file_filter.py
 
 sample:
 	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_1) --lifetime 30 -p 1231231  
 	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_2) --lifetime 30 -p 231231231 
+sample2:
+	$(RUN) validate -d $(DRIVE_ID) -f $(FOLDER_ID_2) --lifetime 30 -p 231231231 --force
 # testing end
 
 TREE_IGNORE=$(VIRTUAL_DIR)|__pycache__
