@@ -184,17 +184,26 @@ class FileFilter:
         output_debug : str = ""
         output : str = ""
         if len(self.error_message) == 0:
-            output_debug += f"The file {self.file_name} has no errors. \n"
+            output_debug += f"The file {self.file_name} has no errors."
             pass
         else:
-            output += f"Errors for file {self.file_name}: " + self.error_message + '\n'
+            output += f"Errors for file {self.file_name}: " + self.error_message 
+
+
+
 
         if Wall:
             if len(self.warning_message) == 0:
-                output_debug += f"The file {self.file_name} has no warnings. \n"
+                if len(output_debug) != 0:
+                    output_debug += '\n'
+
+                output_debug += f"The file {self.file_name} has no warnings."
                 pass
             else:
-                output += f"Warnings for file {self.file_name}: " + self.warning_message + '\n'
+                if len(output) != 0:
+                    output += '\n'
+
+                output += f"Warnings for file {self.file_name}: " + self.warning_message
     
         
         logging.info(output)
