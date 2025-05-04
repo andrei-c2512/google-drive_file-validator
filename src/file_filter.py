@@ -177,25 +177,28 @@ class FileFilter:
         elif config.DELETE_ON_DATE_PATTERN != 0: 
             result = False
          
-        print(result)
         self.log_all(Wall) 
         return result
     #
     def log_all(self, Wall):
+        output_debug : str = ""
         output : str = ""
         if len(self.error_message) == 0:
-            output += f"The file {self.file_name} has no errors. \n"
+            output_debug += f"The file {self.file_name} has no errors. \n"
+            pass
         else:
-            output += f"Errors for file {self.file_name}:\n" + self.error_message + '\n'
+            output += f"Errors for file {self.file_name}: " + self.error_message + '\n'
 
         if Wall:
             if len(self.warning_message) == 0:
-                output += f"The file {self.file_name} has no warnings. \n"
+                output_debug += f"The file {self.file_name} has no warnings. \n"
+                pass
             else:
-                output += f"Warnings for file {self.file_name}:\n" + self.warning_message + '\n'
+                output += f"Warnings for file {self.file_name}: " + self.warning_message + '\n'
     
         
         logging.info(output)
+        logging.debug(output_debug)
 #
 
 

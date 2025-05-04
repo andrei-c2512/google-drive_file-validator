@@ -1,0 +1,6 @@
+Trash , do not hard delete files
+Fix --force
+Fix ugly DATE_PATTERN if statement
+Fix crash when res/config.sh does not exist
+Tell how much memory was freed for every file and the total clean up
+Fix tests

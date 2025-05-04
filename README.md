@@ -97,6 +97,7 @@ python3 src/main.py config <VAR_1>=<VALUE_1>  <VAR_2>=<VALUE_2> ...
 - if you are in ASII and need some features , ask me or request to make you a collaborator
 - contact [me](https://github.com/andrei-c2512) or [Frunza Alexandru](https://github.com/alexfrunza) if you have a problem with setting up a Service Account
 - if you develop on a different system , please add the set-up as a rule in the `makefile`  
+- modify the `CONFIG_PATH` variable in `config.py` to adjust the default `config.sh` search path
 
 ### Coding practices:
 - use `logging` for printing - [Tutorial](https://www.youtube.com/watch?v=urrfJgHwIJA)
